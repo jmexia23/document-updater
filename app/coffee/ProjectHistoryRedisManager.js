@@ -1,3 +1,9 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -15,10 +21,10 @@ const logger = require('logger-sharelatex');
 
 module.exports = (ProjectHistoryRedisManager = {
 	queueOps(project_id, ...rest) {
-		const adjustedLength = Math.max(rest.length, 1),
-			ops = rest.slice(0, adjustedLength - 1),
-			val = rest[adjustedLength - 1],
-			callback = val != null ? val : function(error, projectUpdateCount) {};
+		const adjustedLength = Math.max(rest.length, 1);
+			const ops = rest.slice(0, adjustedLength - 1);
+			const val = rest[adjustedLength - 1];
+			const callback = val != null ? val : function(error, projectUpdateCount) {};
 		const multi = rclient.multi();
 		// Push the ops onto the project history queue
 		multi.rpush(projectHistoryKeys.projectHistoryOps({project_id}), ...Array.from(ops));

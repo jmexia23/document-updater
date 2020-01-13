@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -29,7 +34,7 @@ const appendSkipChars = (op, doc, pos, maxlength) =>
   })()
 ;
 
-type['api'] = {
+type.api = {
   'provides': {'text':true},
 
   // The number of characters in the string
@@ -83,7 +88,7 @@ type['api'] = {
       let textPos = 0;
       const docPos = {index:0, offset:0};
 
-      for (let component of Array.from(op)) {
+      for (const component of Array.from(op)) {
         var part, remainder;
         if (typeof component === 'number') {
           // Skip

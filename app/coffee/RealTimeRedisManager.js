@@ -1,3 +1,9 @@
+/* eslint-disable
+    camelcase,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -29,7 +35,7 @@ module.exports = (RealTimeRedisManager = {
 			if (error != null) { return callback(error); }
 			const jsonUpdates = replys[0];
 			const updates = [];
-			for (let jsonUpdate of Array.from(jsonUpdates)) {
+			for (const jsonUpdate of Array.from(jsonUpdates)) {
 				var update;
 				try {
 					update = JSON.parse(jsonUpdate);

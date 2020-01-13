@@ -1,3 +1,10 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -28,7 +35,7 @@ module.exports = (ProjectManager = {
 			if (error != null) { return callback(error); }
 			const jobs = [];
 			const errors = [];
-			for (let doc_id of Array.from((doc_ids || []))) {
+			for (const doc_id of Array.from((doc_ids || []))) {
 				(doc_id =>
 					jobs.push(callback =>
 						DocumentManager.flushDocIfLoadedWithLock(project_id, doc_id, function(error) {
@@ -70,7 +77,7 @@ module.exports = (ProjectManager = {
 			if (error != null) { return callback(error); }
 			const jobs = [];
 			const errors = [];
-			for (let doc_id of Array.from((doc_ids || []))) {
+			for (const doc_id of Array.from((doc_ids || []))) {
 				(doc_id =>
 					jobs.push(callback =>
 						DocumentManager.flushAndDeleteDocWithLock(project_id, doc_id, function(error) {
@@ -152,7 +159,7 @@ module.exports = (ProjectManager = {
 					return callback(error);
 				}
 				const jobs = [];
-				for (let doc_id of Array.from(doc_ids || [])) {
+				for (const doc_id of Array.from(doc_ids || [])) {
 					(doc_id =>
 						jobs.push(cb =>
 							// get the doc lines from redis
