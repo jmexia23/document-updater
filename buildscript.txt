@@ -1,6 +1,6 @@
 document-updater
 --public-repo=True
---language=coffeescript
+--language=es
 --env-add=
 --node-version=6.9.5
 --acceptance-creds=None
