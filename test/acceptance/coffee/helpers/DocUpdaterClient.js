@@ -1,3 +1,9 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -45,7 +51,7 @@ module.exports = (DocUpdaterClient = {
 		return DocUpdaterClient.preloadDoc(project_id, doc_id, function(error) {
 			if (error != null) { return callback(error); }
 			const jobs = [];
-			for (let update of Array.from(updates)) {
+			for (const update of Array.from(updates)) {
 				(update =>
 					jobs.push(callback => DocUpdaterClient.sendUpdate(project_id, doc_id, update, callback))
 				)(update);
@@ -165,9 +171,9 @@ module.exports = (DocUpdaterClient = {
 });
 
 function __range__(left, right, inclusive) {
-  let range = [];
-  let ascending = left < right;
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1;
+  const range = [];
+  const ascending = left < right;
+  const end = !inclusive ? right : ascending ? right + 1 : right - 1;
   for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
     range.push(i);
   }

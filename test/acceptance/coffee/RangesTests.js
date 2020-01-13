@@ -1,3 +1,9 @@
+/* eslint-disable
+    handle-callback-err,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -49,7 +55,7 @@ describe("Ranges", function() {
 				version: 0
 			});
 			const jobs = [];
-			for (let update of Array.from(this.updates)) {
+			for (const update of Array.from(this.updates)) {
 				(update => {
 					return jobs.push(callback => DocUpdaterClient.sendUpdate(this.project_id, this.doc.id, update, callback));
 				})(update);
@@ -98,7 +104,7 @@ describe("Ranges", function() {
 						version: 0
 					});
 					const jobs = [];
-					for (let update of Array.from(this.updates)) {
+					for (const update of Array.from(this.updates)) {
 						(update => {
 							return jobs.push(callback => DocUpdaterClient.sendUpdate(this.project_id, this.doc.id, update, callback));
 						})(update);
@@ -147,7 +153,7 @@ describe("Ranges", function() {
 						version: 0
 					});
 					const jobs = [];
-					for (let update of Array.from(this.updates)) {
+					for (const update of Array.from(this.updates)) {
 						(update => {
 							return jobs.push(callback => DocUpdaterClient.sendUpdate(this.project_id, this.doc.id, update, callback));
 						})(update);
@@ -355,7 +361,7 @@ describe("Ranges", function() {
 				version: 0
 			});
 			const jobs = [];
-			for (let update of Array.from(this.updates)) {
+			for (const update of Array.from(this.updates)) {
 				(update => {
 					return jobs.push(callback => DocUpdaterClient.sendUpdate(this.project_id, this.doc.id, update, callback));
 				})(update);
@@ -409,7 +415,7 @@ describe("Ranges", function() {
 				meta: { user_id: this.user_id }
 			}];
 			const jobs = [];
-			for (let update of Array.from(this.updates)) {
+			for (const update of Array.from(this.updates)) {
 				(update => {
 					return jobs.push(callback => DocUpdaterClient.sendUpdate(this.project_id, this.doc_id, update, callback));
 				})(update);
