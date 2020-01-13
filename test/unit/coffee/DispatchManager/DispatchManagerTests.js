@@ -1,3 +1,10 @@
+/* eslint-disable
+    handle-callback-err,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -135,7 +142,7 @@ describe("DispatchManager", function() {
 				var checkStatus = () => {
 					if (!this.settings.shuttingDown) { // retry until shutdown
 						setTimeout(checkStatus, 100);
-						return;
+						
 					} else {
 						this.worker._waitForUpdateThenDispatchWorker.callCount.should.equal(3);
 						return done();

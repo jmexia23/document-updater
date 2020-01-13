@@ -1,3 +1,9 @@
+/* eslint-disable
+    camelcase,
+    no-return-assign,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -274,7 +280,7 @@ describe("ShareJS text type", function() {
 			const applySnapshot = (snapshot, op) => text.apply(snapshot, op);
 			
 			const applyRanges = function(rangesTracker, ops) {
-				for (let op of Array.from(ops)) {
+				for (const op of Array.from(ops)) {
 					rangesTracker.applyOp(op, {});
 				}
 				return rangesTracker;
@@ -310,19 +316,19 @@ describe("ShareJS text type", function() {
 			
 			const OPS = [];
 			// Insert ops
-			for (p = 0, end = SNAPSHOT.length, asc = 0 <= end; asc ? p <= end : p >= end; asc ? p++ : p--) {
+			for (p = 0, end = SNAPSHOT.length, asc = end >= 0; asc ? p <= end : p >= end; asc ? p++ : p--) {
 				OPS.push({i: "a", p});
 				OPS.push({i: "bc", p});
 			}
-			for (p = 0, end1 = SNAPSHOT.length-1, asc1 = 0 <= end1; asc1 ? p <= end1 : p >= end1; asc1 ? p++ : p--) {
+			for (p = 0, end1 = SNAPSHOT.length-1, asc1 = end1 >= 0; asc1 ? p <= end1 : p >= end1; asc1 ? p++ : p--) {
 				var asc2, end2;
-				for (length = 1, end2 = SNAPSHOT.length - p, asc2 = 1 <= end2; asc2 ? length <= end2 : length >= end2; asc2 ? length++ : length--) {
+				for (length = 1, end2 = SNAPSHOT.length - p, asc2 = end2 >= 1; asc2 ? length <= end2 : length >= end2; asc2 ? length++ : length--) {
 					OPS.push({d: SNAPSHOT.slice(p, p+length), p});
 				}
 			}
-			for (p = 0, end3 = SNAPSHOT.length-1, asc3 = 0 <= end3; asc3 ? p <= end3 : p >= end3; asc3 ? p++ : p--) {
+			for (p = 0, end3 = SNAPSHOT.length-1, asc3 = end3 >= 0; asc3 ? p <= end3 : p >= end3; asc3 ? p++ : p--) {
 				var asc4, end4;
-				for (length = 1, end4 = SNAPSHOT.length - p, asc4 = 1 <= end4; asc4 ? length <= end4 : length >= end4; asc4 ? length++ : length--) {
+				for (length = 1, end4 = SNAPSHOT.length - p, asc4 = end4 >= 1; asc4 ? length <= end4 : length >= end4; asc4 ? length++ : length--) {
 					OPS.push({c: SNAPSHOT.slice(p, p+length), p, t: this.t});
 				}
 			}
@@ -332,7 +338,7 @@ describe("ShareJS text type", function() {
 				for (var op1 of Array.from(OPS)) {
 					result.push((() => {
 						const result1 = [];
-						for (let op2 of Array.from(OPS)) {
+						for (const op2 of Array.from(OPS)) {
 							const op1_t = transform(op1, op2, "left");
 							const op2_t = transform(op2, op1, "right");
 					
