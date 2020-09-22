@@ -13,6 +13,7 @@ DocumentManager = require "./DocumentManager"
 RangesManager = require "./RangesManager"
 SnapshotManager = require "./SnapshotManager"
 Profiler = require "./Profiler"
+DocumentParser = require "./DocumentParser"
 
 module.exports = UpdateManager =
 	processOutstandingUpdates: (project_id, doc_id, callback = (error) ->) ->
