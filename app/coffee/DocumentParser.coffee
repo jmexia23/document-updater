@@ -1,5 +1,5 @@
 module.exports = DocumentParser =
 
 
-        testFunction ->
+        testFunction : ->
             return "Ok"
