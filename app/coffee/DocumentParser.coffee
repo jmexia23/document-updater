@@ -12,7 +12,7 @@ module.exports = DocumentParser =
 
 	#ARRAY -> ARRAY -> OBJECT
 		
-	parseDoc = (docLines, _callback)->
+	parseDoc = (project_id, doc_id,docLines, callback)->
 
 
 		position = 0
