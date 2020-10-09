@@ -352,6 +352,71 @@ module.exports = RedisManager =
 				[key, timestamp] = reply[0]
 				queueLength = reply[2]
 				callback(null, key, timestamp, queueLength)
+	
+	loadConsistencyTables: (project_id, doc_id, symbols, callback) ->
+		getConnectedUsers project_id, (error, users) ->
+			return callback(error) if error? 
+			makeConsistencyTable user for user in users
+
+			makeConsistencyTable = (user) ->
+				insertObjects object for object in symbols
+			
+			insertObjects = (object) ->
+				rclient.zadd keys.userObjects(doc_id:doc_id, client_id: user), object.position, object.id, callback
+
+				multi = rclient.multi()
+
+				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "order", 0
+				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "time", (new Date).getTime()
+				#missing value ---> snapshot of the object
+
+				multi.exec (err) -> 
+					if err?
+						logger.log  "problem initializing object state"
+						callback (err)
+					
+
+
+				#rclient.zadd keys.flushAndDeleteQueue(), Date.now() + SMOOTHING_OFFSET, project_id, callback
+				#sorted set: userID -> objectID (userObjects)
+				#hash: userID:objtectID -> time, order, value (objectState)
+				
+
+
+				
+	
+	#copied from ConnectedUsersManager in real-time
+	_getConnectedUser: (project_id, client_id, callback)->
+		rclient.hgetall Keys.connectedUser({project_id, client_id}), (err, result)->
+			if !result? or Object.keys(result).length == 0 or !result.user_id
+				result =
+					connected : false
+					client_id:client_id
+			else
+				result.connected = true
+				result.client_id = client_id
+				result.client_age = (Date.now() - parseInt(result.last_updated_at,10)) / 1000
+				if result.cursorData?
+					try
+						result.cursorData = JSON.parse(result.cursorData)
+					catch e
+						logger.error {err: e, project_id, client_id, cursorData: result.cursorData}, "error parsing cursorData JSON" 
+						return callback e
+			callback err, result
+
+	getConnectedUsers: (project_id, callback)->
+		self = @
+		rclient.smembers Keys.clientsInProject({project_id}), (err, results)->
+			return callback(err) if err?
+			jobs = results.map (client_id)->
+				(cb)->
+					self._getConnectedUser(project_id, client_id, cb)
+			async.series jobs, (err, users = [])->
+				return callback(err) if err?
+				users = users.filter (user) ->
+					user?.connected && user?.client_age < REFRESH_TIMEOUT_IN_S
+				callback null, users
+
 
 	_serializeRanges: (ranges, callback = (error, serializedRanges) ->) ->
 		jsonRanges = JSON.stringify(ranges)

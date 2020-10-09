@@ -89,7 +89,10 @@ module.exports =
 				lastUpdatedAt: ({doc_id}) -> "lastUpdatedAt:{#{doc_id}}"
 				pendingUpdates: ({doc_id}) -> "PendingUpdates:{#{doc_id}}"
 				flushAndDeleteQueue: () -> "DocUpdaterFlushAndDeleteQueue"
-				consistencyVector: ({project_id, client_id})-> "consistencyVector:{#{project_id}}:#{client_id}"
+				clientsInProject: ({project_id}) -> "clients_in_project:{#{project_id}}"
+				connectedUser: ({project_id, client_id})-> "connected_user:{#{project_id}}:#{client_id}"
+				userObjects: ({doc_id, client_id})-> "user_objects:{#{doc_id}}:#{client_id}"
+				objectState: ({doc_id, client_id, object_id})-> "object_state:{#{doc_id}}:#{client_id}:#{object_id}"
 
 	max_doc_length: 2 * 1024 * 1024 # 2mb
 
