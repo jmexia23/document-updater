@@ -353,7 +353,11 @@ module.exports = RedisManager =
 				queueLength = reply[2]
 				callback(null, key, timestamp, queueLength)
 	
+
+
+			
 	loadConsistencyTables: (project_id, doc_id, symbols, callback) ->
+		
 		getConnectedUsers project_id, (error, users) ->
 			return callback(error) if error? 
 			makeConsistencyTable user for user in users
@@ -368,16 +372,13 @@ module.exports = RedisManager =
 
 				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "order", 0
 				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "time", (new Date).getTime()
-				#missing value ---> snapshot of the object
+				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "value", object.snapshot
 
 				multi.exec (err) -> 
 					if err?
-						logger.log  "problem initializing object state"
+						logger.log  "problem initializing object states "
 						callback (err)
-					
 
-
-				#rclient.zadd keys.flushAndDeleteQueue(), Date.now() + SMOOTHING_OFFSET, project_id, callback
 				#sorted set: userID -> objectID (userObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
 				

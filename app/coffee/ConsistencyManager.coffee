@@ -4,10 +4,14 @@ RedisManager = require "./RedisManager"
 text = require('./text')
 
 lines = text.lines
-relevant = [
+relevant = [				#temporary
 		'paragraph'
 		'section'
 ]
+fullText = lines.map((item) ->
+	if item == '' then '\n' else item
+).join('')
+
 
 
 module.exports = ConsistencyManager =
@@ -23,6 +27,8 @@ module.exports = ConsistencyManager =
 		position = 0
 		symbols = []
 
+		
+
 		process = (i, line) ->
 			parsedLine = []
 			parsedLine = latexParser.parse(line).value					#consider using .filter
@@ -31,16 +37,32 @@ module.exports = ConsistencyManager =
 					symbols.push({
 					'type': parsedLine[0].name
 					'position': position #double check this; add 1??
-					'id' : makeID
+					'id' : ConsistencyManager.makeID()
 					})
 
-			position += line.length #also need line number??
-			i++
+			if !(typeof parsedLine[0] == 'undefined') then (position += line.length) else (position += 1) #also need line number??
+		
 
-			process i, line for line, i in docLines
+		process i, line for line, i in docLines
+		
+		i = j = 0						#j is needed??
+		len = symbols.length
+		while j < len
+			object = symbols[i]
+			next = symbols[i + 1]
+			ConsistencyManager.getSnapshots i, object, next
+			i = ++j
 
 		callback null, symbols
 
 	makeID : ->
-		crypto.randomBytes(8).toString 'base64'
+		crypto.randomBytes(6).toString 'base64'
+
+	getSnapshots : (i, object, next) ->
+		start = if i == 0 then 0 else object.position 									#assume everything before the first tag as part of the first object 
+		end = if typeof next == 'undefined' then fullText.length else next.position		#assume everything after the last tag as part of the last object  
+		newSnapshot = fullText.substring(start, end)
+		object.snapshot = newSnapshot
+		return
+
 		  
