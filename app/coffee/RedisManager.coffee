@@ -363,21 +363,21 @@ module.exports = RedisManager =
 			makeConsistencyTable user for user in users###
 
 			#makeConsistencyTable = (user) ->
-			insertObjects object for object in symbols
+		insertObjects object for object in symbols
 			
-			insertObjects = (object) ->
-				rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
+		insertObjects = (object) ->
+			rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
 
-				multi = rclient.multi()
+			multi = rclient.multi()
 
-				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
-				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
-				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
+			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
+			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
+			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
 
-				multi.exec (err) -> 
-					if err?
-						logger.log  "problem initializing object states "
-						callback (err)
+			multi.exec (err) -> 
+				if err?
+					logger.log  "problem initializing object states "
+					callback (err)
 
 				#sorted set: userID -> objectID (userObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
