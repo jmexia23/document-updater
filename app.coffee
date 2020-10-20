@@ -46,6 +46,9 @@ app.param 'doc_id', (req, res, next, doc_id) ->
 	else
 		next new Error("invalid doc id")
 
+
+#new url from real-time for when client opens doc
+app.get    '/project/:project_id/doc/:doc_id',                          HttpController.getDocAndLoadConsistencyTable
 app.get    '/project/:project_id/doc/:doc_id',                          HttpController.getDoc
 # temporarily keep the GET method for backwards compatibility
 app.get    '/project/:project_id/doc',                                  HttpController.getProjectDocsAndFlushIfOld

@@ -356,23 +356,23 @@ module.exports = RedisManager =
 
 
 			
-	loadConsistencyTables: (project_id, doc_id, symbols, callback) ->
+	loadConsistencyTables: (project_id, doc_id, client_id, symbols, callback) ->
 		
-		getConnectedUsers project_id, (error, users) ->
+		###getConnectedUsers project_id, (error, users) -> #not considering more than one doc per user
 			return callback(error) if error? 
-			makeConsistencyTable user for user in users
+			makeConsistencyTable user for user in users###
 
-			makeConsistencyTable = (user) ->
-				insertObjects object for object in symbols
+			#makeConsistencyTable = (user) ->
+			insertObjects object for object in symbols
 			
 			insertObjects = (object) ->
-				rclient.zadd keys.userObjects(doc_id:doc_id, client_id: user), object.position, object.id, callback
+				rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
 
 				multi = rclient.multi()
 
-				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "order", 0
-				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "time", (new Date).getTime()
-				multi.hset keys.objectState (doc_id: doc_id, client_id: user, objectID: object.id), "value", object.snapshot
+				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
+				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
+				multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
 
 				multi.exec (err) -> 
 					if err?

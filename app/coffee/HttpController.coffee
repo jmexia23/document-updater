@@ -1,3 +1,4 @@
+ConsistencyManager = require "./ConsistencyManager"
 DocumentManager = require "./DocumentManager"
 HistoryManager = require "./HistoryManager"
 ProjectManager = require "./ProjectManager"
@@ -35,6 +36,42 @@ module.exports = HttpController =
 				ops: ops
 				ranges: ranges
 				pathname: pathname
+			
+			
+	#same as getDoc but also loads conistency table for new client
+	getDocAndLoadConsistencyTable: (req, res, next = (error) ->) ->
+		doc_id = req.params.doc_id
+		project_id = req.params.project_id
+		client_id = req.params.client_id     #add this to the request on real-time
+		logger.log project_id: project_id, doc_id: doc_id, "getting doc via http"
+		timer = new Metrics.Timer("http.getDoc")
+
+		if req.query?.fromVersion?
+			fromVersion = parseInt(req.query.fromVersion, 10)
+		else
+			fromVersion = -1
+
+		DocumentManager.getDocAndRecentOpsWithLock project_id, doc_id, fromVersion, (error, lines, version, ops, ranges, pathname) ->
+			timer.done()
+			return next(error) if error?
+			logger.log project_id: project_id, doc_id: doc_id, "got doc via http"
+			if !lines? or !version?
+				return next(new Errors.NotFoundError("document not found"))
+			res.json
+				id: doc_id
+				lines: lines
+				version: version
+				ops: ops
+				ranges: ranges
+				pathname: pathname
+			
+			#load consistency tables here	
+			ConsistencyManager.loadDoc project_id, doc_id, lines, (error) -> 				#missing client_id
+				if error?
+					logger.error err: error, project_id: project_id, "error loading consistency table"
+
+			
+
 
 	_getTotalSizeOfLines: (lines) ->
 		size = 0
