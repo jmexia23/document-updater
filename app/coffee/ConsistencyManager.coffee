@@ -10,7 +10,7 @@ relevant = [				#temporary
 
 module.exports = ConsistencyManager =
 	loadDoc: (project_id, doc_id, client_id, lines, callback) ->
-		parseDoc lines, (error,  symbols ) =>
+		ConsistencyManager.parseDoc lines, (error,  symbols ) =>
 			return callback(error) if error?
 			RedisManager.loadConsistencyTables project_id, doc_id, client_id, symbols, (error) ->		#push into redis table for all active clients in project (clients_in_project)
 				return callback(error) if error?  
