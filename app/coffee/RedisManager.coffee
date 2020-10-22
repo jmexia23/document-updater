@@ -363,9 +363,10 @@ module.exports = RedisManager =
 			makeConsistencyTable user for user in users###
 
 			#makeConsistencyTable = (user) ->
-		RedisManager.insertObjects object for object in symbols
+		#RedisManager.insertObjects object for object in symbols
 			
-		insertObjects = (object) ->
+		#insertObjects = (object) ->
+		for object in symbols
 			rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
 
 			multi = rclient.multi()
