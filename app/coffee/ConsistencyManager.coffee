@@ -1,5 +1,6 @@
 crypto = require('crypto')
 latexParser = require('latex-parser').latexParser
+logger = require('logger-sharelatex')
 RedisManager = require "./RedisManager"
 
 
@@ -21,11 +22,12 @@ module.exports = ConsistencyManager =
 		position = 0
 		symbols = []
 
-		
+		logger.log typeof lines "doc lines"
 
 		process = (i, line) ->
+			logger.log typeof line, "line"
 			parsedLine = []
-			parsedLine = latexParser.parse(line).value					#consider using .filter
+			parsedLine = latexParser.parse(line).value					#error: .parse must be called with a string or a buffer as its argument	consider using .filter
 
 			if (!(typeof parsedLine[0] == 'undefined') and parsedLine[0].hasOwnProperty('name') and relevant.includes(parsedLine[0].name)) #assuming only one token per line
 					symbols.push({
