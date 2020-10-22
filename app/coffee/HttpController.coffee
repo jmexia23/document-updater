@@ -66,7 +66,7 @@ module.exports = HttpController =
 				pathname: pathname
 			
 			#load consistency tables here
-			docLines = JSON.stringify lines
+			
 			
 			ConsistencyManager.loadDoc project_id, doc_id, lines, (error) -> 				#missing client_id
 				if error?
