@@ -22,10 +22,8 @@ module.exports = ConsistencyManager =
 		position = 0
 		symbols = []
 
-		logger.log typeof lines "doc lines"
 
 		process = (i, line) ->
-			logger.log typeof line, "line"
 			parsedLine = []
 			parsedLine = latexParser.parse(line).value					#error: .parse must be called with a string or a buffer as its argument	consider using .filter
 

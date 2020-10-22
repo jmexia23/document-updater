@@ -67,8 +67,7 @@ module.exports = HttpController =
 			
 			#load consistency tables here
 			
-			
-			ConsistencyManager.loadDoc project_id, doc_id, lines, (error) -> 				#missing client_id
+			ConsistencyManager.loadDoc project_id, doc_id, client_id, lines, (error) -> 				#missing client_id
 				if error?
 					logger.error err: error, project_id: project_id, "error loading consistency table"
 
