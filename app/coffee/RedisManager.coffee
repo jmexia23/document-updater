@@ -370,14 +370,14 @@ module.exports = RedisManager =
 		multi = rclient.multi()	
 		
 		for object in symbols
-
+		
 			rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
 
 			
 
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0 	#TODO object.id showing up as undefined
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
 
 			multi.exec (err) -> 
 				if err?
