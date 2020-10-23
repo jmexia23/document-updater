@@ -366,18 +366,22 @@ module.exports = RedisManager =
 		#RedisManager.insertObjects object for object in symbols
 			
 		#insertObjects = (object) ->
+
+		multi = rclient.multi()	
+		
 		for object in symbols
+
 			rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
 
-			multi = rclient.multi()
+			
 
-			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
-			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
-			multi.hset keys.objectState (doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "order", 0
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "time", (new Date).getTime()
+			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, objectID: object.id), "value", object.snapshot
 
 			multi.exec (err) -> 
 				if err?
-					logger.log  "problem initializing object states "
+					logger.log  "problem initializing object states"
 					callback (err)
 
 				#sorted set: userID -> objectID (userObjects)
