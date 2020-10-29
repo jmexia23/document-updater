@@ -54,7 +54,14 @@ module.exports = ConsistencyManager =
 			i = ++j
 
 		callback null, symbols
+	
 
+	queueUpdate: (project_id, doc_id, update, callback) ->
+		RedisManager.getUsersInDoc project_id, doc_id, (error, users) ->
+			for user in users
+				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) ->
+
+	
 	makeID : ->
 		crypto.randomBytes(6).toString 'base64'
 
