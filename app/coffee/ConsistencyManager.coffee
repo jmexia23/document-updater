@@ -57,9 +57,8 @@ module.exports = ConsistencyManager =
 	
 
 	queueUpdate: (project_id, doc_id, update, callback) ->
-		RedisManager.getUsersInDoc project_id, doc_id, (error, users) ->
-			for user in users
-				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) ->
+		RedisManager.recordUpdate project_id, doc_id, update, (error) ->
+			return callback(error) if error?
 
 	
 	makeID : ->

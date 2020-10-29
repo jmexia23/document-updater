@@ -376,17 +376,19 @@ module.exports = RedisManager =
 				#sorted set: userID -> objectID (userObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
 
-	recordUpdate: (project_id, doc_id, client_id, update, callback) ->
+	recordUpdate: (project_id, doc_id, update, callback) ->
 		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
 			return callback (err) if err?
 			for client in clients
 				client_id = client.split(":")[3] 													 #client_id is 3rd element of key
-				continue if client_id == update.meta.source
 				op = update.op[0] 																	 #consider only first op or loop through all?
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> #more than one op per update possible?
 					return callback (err) if err?
-					RedisManager.queueUpdate project_id, doc_id, client_id, object_id, update, (err) ->
-						return callback (err) if err?
+					if client_id == update.meta.source
+						continue 																	#do needed operations
+					else
+						RedisManager.queueUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+							return callback (err) if err?
 
 	getClientsInDoc: (project_id, doc_id, callback) -> 
 		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
@@ -412,9 +414,6 @@ module.exports = RedisManager =
 			if err?
 				logger.log  "failed to queue update"
 				callback (err)
-
-
-
 
 	#####################CHANGES########################
 					
