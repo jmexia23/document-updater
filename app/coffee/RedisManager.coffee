@@ -352,32 +352,21 @@ module.exports = RedisManager =
 				[key, timestamp] = reply[0]
 				queueLength = reply[2]
 				callback(null, key, timestamp, queueLength)
+
+	#####################CHANGES########################			
 	
-
-
-			
 	loadConsistencyTables: (project_id, doc_id, client_id, symbols, callback) ->
 		
-		###getConnectedUsers project_id, (error, users) -> #not considering more than one doc per user
-			return callback(error) if error? 
-			makeConsistencyTable user for user in users###
-
-			#makeConsistencyTable = (user) ->
-		#RedisManager.insertObjects object for object in symbols
-			
-		#insertObjects = (object) ->
-
 		multi = rclient.multi()	
 		
 		for object in symbols
-
-			rclient.zadd keys.userObjects(doc_id:doc_id, client_id: client_id), object.position, object.id, callback
-
 			
+			multi.zadd keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), object.position, object.id, callback
+			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0 	
+			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
+			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
 
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
-			multi.hset keys.objectState(doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
+			#TODO add an EXPIRE to the keys
 
 			multi.exec (err) -> 
 				if err?
@@ -386,44 +375,48 @@ module.exports = RedisManager =
 
 				#sorted set: userID -> objectID (userObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
-				
 
+	recordUpdate: (project_id, doc_id, update, callback) ->
+		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
+			return callback (err) if err?
+			for client in clients
+				client_id = client.split(":")[3] 													 #client_id is 3rd element of key
+				op = update.op[0] 																	 #consider only first op or loop through all?
+				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> #more than one op per update possible?
+					return callback (err) if err?
+					if client_id == update.meta.source
+						continue 																	#do needed operations
+					else
+						RedisManager.queueUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+							return callback (err) if err?
 
-				
-	
-	#copied from ConnectedUsersManager in real-time
-	_getConnectedUser: (project_id, client_id, callback)->
-		rclient.hgetall Keys.connectedUser({project_id, client_id}), (err, result)->
-			if !result? or Object.keys(result).length == 0 or !result.user_id
-				result =
-					connected : false
-					client_id:client_id
-			else
-				result.connected = true
-				result.client_id = client_id
-				result.client_age = (Date.now() - parseInt(result.last_updated_at,10)) / 1000
-				if result.cursorData?
-					try
-						result.cursorData = JSON.parse(result.cursorData)
-					catch e
-						logger.error {err: e, project_id, client_id, cursorData: result.cursorData}, "error parsing cursorData JSON" 
-						return callback e
-			callback err, result
-
-	getConnectedUsers: (project_id, callback)->
-		self = @
-		rclient.smembers Keys.clientsInProject({project_id}), (err, results)->
+	getClientsInDoc: (project_id, doc_id, callback) -> 
+		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
 			return callback(err) if err?
-			jobs = results.map (client_id)->
-				(cb)->
-					self._getConnectedUser(project_id, client_id, cb)
-			async.series jobs, (err, users = [])->
-				return callback(err) if err?
-				users = users.filter (user) ->
-					user?.connected && user?.client_age < REFRESH_TIMEOUT_IN_S
-				callback null, users
+			callback null, reply #array of keys
 
+	getObjectForOp: (project_id, doc_id, client_id, op, callback) ->  #op = update.op 
+		position = op.p
+	
+		rclient.zrangebyscore keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 0, position, (err, reply) ->
+			return callback(err) if err?
+			object_id = reply[0] 
+			callback null, object_id
+	
+	queueUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
 
+		multi = rclient.multi()
+
+		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 1 
+		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), update
+		
+		multi.exec (err) -> 
+			if err?
+				logger.log  "failed to queue update"
+				callback (err)
+
+	#####################CHANGES########################
+					
 	_serializeRanges: (ranges, callback = (error, serializedRanges) ->) ->
 		jsonRanges = JSON.stringify(ranges)
 		if jsonRanges? and jsonRanges.length > MAX_RANGES_SIZE

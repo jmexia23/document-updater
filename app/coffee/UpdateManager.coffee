@@ -69,10 +69,12 @@ module.exports = UpdateManager =
 				profile.log("sendData")
 			profile.end()
 			_callback(error)
-
 		profile = new Profiler("applyUpdate", {project_id, doc_id})
 		UpdateManager._sanitizeUpdate update
 		profile.log("sanitizeUpdate")
+		ConsistencyManager.queueUpdate project_id, doc_id, update, (error) ->         #TEST
+			profile.log("queueUpdate")
+			return callback(error) if error?
 		DocumentManager.getDoc project_id, doc_id, (error, lines, version, ranges, pathname, projectHistoryId) ->
 			profile.log("getDoc")
 			return callback(error) if error?
