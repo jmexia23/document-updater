@@ -376,7 +376,7 @@ module.exports = RedisManager =
 				#sorted set: userID -> objectID (userObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
 
-	recordUpdate: (project_id, doc_id, client_id, update, callback) ->
+	recordUpdate: (project_id, doc_id, update, callback) ->
 		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
 			return callback (err) if err?
 			for client in clients
