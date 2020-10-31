@@ -386,7 +386,7 @@ module.exports = RedisManager =
 					return callback (err) if err?
 					if client_id == update.meta.source
 						return 																	#do needed operations
-					RedisManager.queueUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+					RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 						return callback (err) if err?
 
 	getClientsInDoc: (project_id, doc_id, callback) -> 
@@ -402,7 +402,7 @@ module.exports = RedisManager =
 			object_id = reply[0] 
 			callback null, object_id
 	
-	queueUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
+	processUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
 
 		multi = rclient.multi()
 
