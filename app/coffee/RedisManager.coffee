@@ -406,8 +406,8 @@ module.exports = RedisManager =
 
 		multi = rclient.multi()
 
-		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 1 
-		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), update
+		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
+		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), update
 		
 		multi.exec (err) -> 
 			if err?
