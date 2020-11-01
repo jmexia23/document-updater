@@ -362,11 +362,13 @@ module.exports = RedisManager =
 		for object in symbols
 			
 			multi.zadd keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), object.position, object.id, callback
+			multi.expire keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 30 * minutes #30 minutes TTL
+
 			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0 	
 			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
 			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
+			multi.expire keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), 30 * minutes #30 minutes TTL
 
-			#TODO add an EXPIRE to the keys
 
 			multi.exec (err) -> 
 				if err?
