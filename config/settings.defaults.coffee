@@ -94,6 +94,7 @@ module.exports =
 				userObjects: ({project_id, doc_id, client_id})-> "user_objects:#{project_id}:#{doc_id}:#{client_id}"
 				objectState: ({project_id, doc_id, client_id, object_id})-> "object_state:#{project_id}#{doc_id}:#{client_id}:#{object_id}"
 				updateQueue: ({project_id, doc_id, client_id, object_id}) -> "update_queue:#{project_id}#{doc_id}:#{client_id}:#{object_id}"
+				
 
 	max_doc_length: 2 * 1024 * 1024 # 2mb
 

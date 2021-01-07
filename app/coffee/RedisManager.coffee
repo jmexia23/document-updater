@@ -382,12 +382,12 @@ module.exports = RedisManager =
 		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
 			return callback (err) if err?
 			for client in clients
-				client_id = client.split(":")[3] 													 #client_id is 3rd element of key
+				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
 				op = (update.op)[0] 																	 #consider only first op or loop through all?
-				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> #more than one op per update possible?
+				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
 					return callback (err) if err?
 					if client_id == update.meta.source
-						return 																	#do needed operations
+						return 																			 #do needed operations
 					RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 						return callback (err) if err?
 
@@ -408,8 +408,10 @@ module.exports = RedisManager =
 
 		multi = rclient.multi()
 
+		jsonUpdate = JSON.stringify(update)
+
 		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
-		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), update
+		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), jsonUpdate  #porque client_id? fila nao e por objecto?
 		
 		multi.exec (err) -> 
 			if err?
