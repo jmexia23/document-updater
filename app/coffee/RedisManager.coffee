@@ -405,13 +405,19 @@ module.exports = RedisManager =
 			callback null, object_id
 	
 	processUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
+		
+		jsonUpdate = JSON.stringify(update)
+		update_id = update.meta._id
 
 		multi = rclient.multi()
 
-		jsonUpdate = JSON.stringify(update)
+		position = update.op[0].p
+		length = if update.op[0].i? then (update.op[0].i).length else -((update.op[0].d).length) #ver se é i: positivo ou d: negativo
 
 		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
 		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), jsonUpdate  #porque client_id? fila nao e por objecto?
+		multi.hmset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "position", position, "length", length
+
 		
 		multi.exec (err) -> 
 			if err?
