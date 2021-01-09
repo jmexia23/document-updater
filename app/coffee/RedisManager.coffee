@@ -407,7 +407,7 @@ module.exports = RedisManager =
 	processUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
 		
 		jsonUpdate = JSON.stringify(update)
-		update_id = update.meta._id
+		update_id = update._id #a aparecer como "undefined" no Redis
 
 		multi = rclient.multi()
 
@@ -416,7 +416,7 @@ module.exports = RedisManager =
 
 		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
 		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), jsonUpdate  #porque client_id? fila nao e por objecto?
-		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "position", position
+		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "position", position       #hmset nao esta a funcionar...
 		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "length", length
 		
 		multi.exec (err) -> 
