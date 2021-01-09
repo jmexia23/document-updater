@@ -407,7 +407,7 @@ module.exports = RedisManager =
 	processUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
 		
 		jsonUpdate = JSON.stringify(update)
-		update_id = update._id #a aparecer como "undefined" no Redis
+		update_id = 1 #update._id #a aparecer como "undefined" no Redis
 
 		multi = rclient.multi()
 
