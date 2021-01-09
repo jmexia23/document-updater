@@ -57,11 +57,12 @@ module.exports = ConsistencyManager =
 	
 
 	queueUpdate: (project_id, doc_id, update, callback) ->
+		#update_id = ConsistencyManager.makeID()
 		RedisManager.recordUpdate project_id, doc_id, update, (error) ->
 			return callback(error) if error?
 
 	
-	makeID : ->
+	makeID : ->  #replace with UUID's?
 		crypto.randomBytes(6).toString 'base64'
 
 	getSnapshots : (i, object, next, fullText) ->
