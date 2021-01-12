@@ -387,6 +387,8 @@ module.exports = RedisManager =
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
 					return callback (err) if err?
 					if client_id == update.meta.source
+						saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+							return callback (err) if err?
 						return 																			 #do needed operations
 					RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 						return callback (err) if err?
@@ -410,21 +412,30 @@ module.exports = RedisManager =
 		update_id = update.hash #pensar nisto
 
 		multi = rclient.multi()
-
-		position = update.op[0].p
-		length = if update.op[0].i? then (update.op[0].i).length else -((update.op[0].d).length) #ver se é i: positivo ou d: negativo
-
-		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
+		
 		multi.rpush   keys.updateQueue(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), jsonUpdate  #porque client_id? fila nao e por objecto?
-
-
-		#separar estas duas para reutilizar
-		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "position", position       #hmset nao esta a funcionar...
-		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "length", length
+		multi.hincrby keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object_id), "order", 1 
 		
 		multi.exec (err) -> 
 			if err?
 				logger.log  "failed to queue update"
+				callback (err)
+
+	saveAppliedUpdate: (project_id, doc_id, client_id, object_id, update, callback) ->
+
+		update_id = update.hash 
+		position = update.op[0].p
+		length = if update.op[0].i? then (update.op[0].i).length else -((update.op[0].d).length) #ver se é i: positivo ou d: negativo
+
+		multi = rclient.multi()
+
+		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "position", position       #hmset nao esta a funcionar...
+		multi.hset   keys.appliedUpdate(project_id: project_id, client_id: client_id, update_id: update_id), "length", length			
+		#pode ser necessario adicionar um time stamp 
+
+		multi.exec (err) -> 
+			if err?
+				logger.log  "failed to save applied update"
 				callback (err)
 
 	#####################CHANGES########################

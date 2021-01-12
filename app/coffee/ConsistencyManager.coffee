@@ -56,7 +56,7 @@ module.exports = ConsistencyManager =
 		callback null, symbols
 	
 
-	queueUpdate: (project_id, doc_id, update, callback) ->
+	recordUpdate: (project_id, doc_id, update, callback) ->
 		#update_id = ConsistencyManager.makeID()
 		RedisManager.recordUpdate project_id, doc_id, update, (error) ->
 			return callback(error) if error?
