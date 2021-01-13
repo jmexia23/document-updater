@@ -389,9 +389,9 @@ module.exports = RedisManager =
 					if client_id == update.meta.source
 						saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 							return callback (err) if err?
-						return 																			 #do needed operations
-					RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
-						return callback (err) if err?
+					else																		 #do needed operations
+						RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+							return callback (err) if err?
 
 	getClientsInDoc: (project_id, doc_id, callback) -> 
 		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
