@@ -387,7 +387,7 @@ module.exports = RedisManager =
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
 					return callback (err) if err?
 					if client_id == update.meta.source
-						saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+						RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->     #savaAppliedUpdate is not defined
 							return callback (err) if err?
 					else																		 #do needed operations
 						RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
