@@ -385,13 +385,16 @@ module.exports = RedisManager =
 				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
 				op = (update.op)[0] 																	 #consider only first op or loop through all?
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
-					return callback (err) if err?
+					rclient.keys client_id
+
+				###
+					return callback (err) if error?
 					if client_id == update.meta.source
-						RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->     #savaAppliedUpdate is not defined
+						RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 							return callback (err) if err?
 					else																		 #do needed operations
 						RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
-							return callback (err) if err?
+							return callback (err) if err?###
 
 	getClientsInDoc: (project_id, doc_id, callback) -> 
 		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
