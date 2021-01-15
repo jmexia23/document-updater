@@ -389,7 +389,7 @@ module.exports = RedisManager =
 			finalCallback = (err) ->
 				callback(err)
 
-			async.eachseries(clients, doUpdate, finalCallback)
+			async.eachSeries(clients, doUpdate, finalCallback)
 
 			###for client in clients
 				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
