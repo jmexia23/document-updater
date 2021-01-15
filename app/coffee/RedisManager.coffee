@@ -412,7 +412,7 @@ module.exports = RedisManager =
 			callback null, reply #array of keys
 
 
-	applyUpdate: (project_id, doc_id, update, client_id, callback) ->
+	applyUpdate: (project_id, doc_id, client_id, update, callback) ->
 		op = (update.op)[0]
 		RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) ->
 			return callback (err) if error?
