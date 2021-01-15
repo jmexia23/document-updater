@@ -381,13 +381,23 @@ module.exports = RedisManager =
 	recordUpdate: (project_id, doc_id, update, callback) ->
 		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
 			return callback (err) if err?
-			for client in clients
+			doUpdate = (client, cb)->
+				client_id = client.split(":")[3]
+				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
+					profile.log("applyUpdate")
+					cb(err)
+			finalCallback = (err) ->
+				callback(err)
+
+			async.eachseries(clients, doUpdate, finalCallback)
+
+			###for client in clients
 				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
 				op = (update.op)[0] 																	 #consider only first op or loop through all?
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
 					rclient.keys client_id
 
-				###
+				
 					return callback (err) if error?
 					if client_id == update.meta.source
 						RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
@@ -400,6 +410,20 @@ module.exports = RedisManager =
 		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
 			return callback(err) if err?
 			callback null, reply #array of keys
+
+
+	applyUpdate: (project_id, doc_id, update, client_id, callback) ->
+		op = (update.op)[0]
+		RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) ->
+			return callback (err) if error?
+			if client_id == update.meta.source
+				RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+					return callback (err) if err?
+			else 
+				RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
+				return callback (err) if err?	
+
+
 
 	getObjectForOp: (project_id, doc_id, client_id, op, callback) ->  #op = update.op 
 		position = op.p
