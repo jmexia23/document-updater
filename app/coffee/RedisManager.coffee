@@ -379,12 +379,14 @@ module.exports = RedisManager =
 				#hash: userID:objtectID -> time, order, value (objectState)
 
 	recordUpdate: (project_id, doc_id, update, callback) ->
-		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
-			return callback (err) if err?
-			rclient.keys clients[0]
-			rclient.keys clients[1]
-			rclient.keys clients[2]
-			doUpdate = (client, cb)->
+		RedisManager.getClientsInDoc project_id, doc_id, (err, clients) ->
+			return callback (err) if err?	
+			for client in clients
+				client_id = client.split(":")[3]
+				rclient.key client_id
+				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
+					return callback (err) if err?
+						###doUpdate = (client, cb)->
 				client_id = client.split(":")[3]
 				rclient.keys client_id
 				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
@@ -395,7 +397,6 @@ module.exports = RedisManager =
 
 			async.eachSeries(clients, doUpdate, finalCallback)
 
-			###for client in clients
 				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
 				op = (update.op)[0] 																	 #consider only first op or loop through all?
 				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
@@ -409,7 +410,6 @@ module.exports = RedisManager =
 					else																		 #do needed operations
 						RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
 							return callback (err) if err?###
-
 	getClientsInDoc: (project_id, doc_id, callback) -> 
 		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
 			return callback(err) if err?
