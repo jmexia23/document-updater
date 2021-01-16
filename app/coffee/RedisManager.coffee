@@ -383,7 +383,7 @@ module.exports = RedisManager =
 			return callback (err) if err?	
 			for client in clients
 				client_id = client.split(":")[3]
-				rclient.key client_id
+				rclient.keys client_id
 				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
 					return callback (err) if err?
 						###doUpdate = (client, cb)->
