@@ -381,6 +381,9 @@ module.exports = RedisManager =
 	recordUpdate: (project_id, doc_id, update, callback) ->
 		RedisManager.getClientsInDoc project_id, doc_id, (error, clients) ->
 			return callback (err) if err?
+			rclient.keys clients[0]
+			rclient.keys clients[1]
+			rclient.keys clients[2]
 			doUpdate = (client, cb)->
 				client_id = client.split(":")[3]
 				rclient.keys client_id
