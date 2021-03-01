@@ -91,7 +91,7 @@ module.exports =
 				flushAndDeleteQueue: () -> "DocUpdaterFlushAndDeleteQueue"
 				clientsInProject: ({project_id}) -> "clients_in_project:{#{project_id}}"
 				connectedUser: ({project_id, client_id})-> "connected_user:{#{project_id}}:#{client_id}"
-				userObjects: ({project_id, doc_id, client_id})-> "user_objects:#{project_id}:#{doc_id}:#{client_id}"
+				clientObjects: ({project_id, doc_id, client_id})-> "client_objects:#{project_id}:#{doc_id}:#{client_id}" 
 				objectState: ({project_id, doc_id, client_id, object_id})-> "object_state:#{project_id}:#{doc_id}:#{client_id}:#{object_id}"
 				updateQueue: ({project_id, doc_id, client_id, object_id}) -> "update_queue:#{project_id}:#{doc_id}:#{client_id}:#{object_id}"
 				appliedUpdate: ({project_id, client_id, update_id }) ->  "applied_update:#{project_id}:#{client_id}:#{update_id}"

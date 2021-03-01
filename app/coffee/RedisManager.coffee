@@ -361,12 +361,13 @@ module.exports = RedisManager =
 		
 		for object in symbols
 			
-			multi.zadd keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), object.position, object.id, callback
-			multi.expire keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 30 * minutes #30 minutes TTL
+			multi.zadd   keys.clientObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), object.position, object.id, callback
+			multi.expire keys.clientObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 30 * minutes #30 minutes TTL 
+																													 #need to revise this, make smaller,d when to refresh 
 
-			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0 	
-			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
-			multi.hset keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
+			multi.hset   keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "order", 0 	
+			multi.hset   keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "time", (new Date).getTime()
+			multi.hset   keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), "value", object.snapshot
 			multi.expire keys.objectState(project_id: project_id, doc_id: doc_id, client_id: client_id, object_id: object.id), 30 * minutes #30 minutes TTL
 
 
@@ -375,49 +376,26 @@ module.exports = RedisManager =
 					logger.log  "problem initializing object states"
 					callback (err)
 
-				#sorted set: userID -> objectID (userObjects)
+				#sorted set: userID -> objectID (clientObjects)
 				#hash: userID:objtectID -> time, order, value (objectState)
 
 	recordUpdate: (project_id, doc_id, update, callback) ->
 		RedisManager.getClientsInDoc project_id, doc_id, (err, clients) ->
 			return callback (err) if err?	
 			for client in clients
-				client_id = client.split(":")[3]
+				client_id = client.split(":")[3]		#client_id is 3rd element of key
 				rclient.keys client_id
 				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
 					return callback (err) if err?
-						###doUpdate = (client, cb)->
-				client_id = client.split(":")[3]
-				rclient.keys client_id
-				RedisManager.applyUpdate project_id, doc_id, client_id, update, (err) ->
-					profile.log("applyUpdate")
-					cb(err)
-			finalCallback = (err) ->
-				callback(err)
 
-			async.eachSeries(clients, doUpdate, finalCallback)
-
-				client_id = client.split(":")[3] 														 #client_id is 3rd element of key
-				op = (update.op)[0] 																	 #consider only first op or loop through all?
-				RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) -> 	 #more than one op per update possible?
-					rclient.keys client_id
-
-				
-					return callback (err) if error?
-					if client_id == update.meta.source
-						RedisManager.saveAppliedUpdate project_id, doc_id, client_id, object_id, update, (err) ->
-							return callback (err) if err?
-					else																		 #do needed operations
-						RedisManager.processUpdate project_id, doc_id, client_id, object_id, update, (err) ->
-							return callback (err) if err?###
 	getClientsInDoc: (project_id, doc_id, callback) -> 
-		rclient.keys keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) ->
+		rclient.keys keys.clientObjects(project_id: project_id, doc_id:doc_id, client_id: "*"), (err, reply) -> #change this to clients in project?
 			return callback(err) if err?
 			callback null, reply #array of keys
 
 
 	applyUpdate: (project_id, doc_id, client_id, update, callback) ->
-		op = (update.op)[0]
+		op = (update.op)[0]#pôr for aqui
 		RedisManager.getObjectForOp project_id, doc_id, client_id, op, (error, object_id) ->
 			return callback (err) if error?
 			if client_id == update.meta.source

@@ -3,7 +3,7 @@ RedisManager = require "./RedisManager"
 Errors = require "./Errors"
 
 module.exports = class ShareJsDB
-	constructor: (@project_id, @doc_id, @lines, @version) ->
+	constructor: (@project_id, @doc_id, @lines, @version) -> #add @client_id
 		@appliedOps = {}
 		# ShareJS calls this detacted from the instance, so we need
 		# bind it to keep our context that can access @appliedOps
@@ -28,7 +28,9 @@ module.exports = class ShareJsDB
 		callback()
 
 	getSnapshot: (doc_key, callback) ->
-		if doc_key != Keys.combineProjectIdAndDocId(@project_id, @doc_id)
+		[project_id, doc_id, client_id, doc_id] = doc_key.split(":") #vfc probably temporary
+		project_doc = project_id + ":" + doc_id
+		if project_doc != Keys.combineProjectIdAndDocId(@project_id, @doc_id) #change to Keys.combineProjectIdAndDocIdAndClientId(project_id, doc_id, client_id)
 			return callback(new Errors.NotFoundError("unexpected doc_key #{doc_key}, expected #{Keys.combineProjectIdAndDocId(@project_id, @doc_id)}"))
 		else
 			return callback null, {

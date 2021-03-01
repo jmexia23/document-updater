@@ -16,8 +16,9 @@ util.inherits ShareJsModel, EventEmitter
 MAX_AGE_OF_OP = 80
 
 module.exports = ShareJsUpdateManager =
-	getNewShareJsModel: (project_id, doc_id, lines, version) ->
+	getNewShareJsModel: (project_id, doc_id, lines, version) -> #add client_id as argument
 		db = new ShareJsDB(project_id, doc_id, lines, version)
+		#db = new ShareJsDB(project_id, doc_id, client_id, lines, version)
 		model = new ShareJsModel(db, maxDocLength: Settings.max_doc_length, maximumAge: MAX_AGE_OF_OP)
 		model.db = db
 		return model
@@ -27,6 +28,11 @@ module.exports = ShareJsUpdateManager =
 		jobs = []
 		# record the update version before it is modified
 		incomingUpdateVersion = update.v
+
+		#vfc temporary
+		client_id = update.meta.source (temporary)
+
+
 		# We could use a global model for all docs, but we're hitting issues with the
 		# internal state of ShareJS not being accessible for clearing caches, and
 		# getting stuck due to queued callbacks (line 260 of sharejs/server/model.coffee)
@@ -34,7 +40,8 @@ module.exports = ShareJsUpdateManager =
 		# my 2009 MBP).
 		model = @getNewShareJsModel(project_id, doc_id, lines, version)
 		@_listenForOps(model)
-		doc_key = Keys.combineProjectIdAndDocId(project_id, doc_id)
+		#doc_key = Keys.combineProjectIdAndDocId(project_id, doc_id)
+		doc_key = Keys.combineProjectIdAndDocIdAndClientId(project_id, doc_id, client_id) #vfc
 		model.applyOp doc_key, update, (error) ->
 			if error?
 				if error == "Op already submitted"
@@ -66,7 +73,7 @@ module.exports = ShareJsUpdateManager =
 
 	_listenForOps: (model) ->
 		model.on "applyOp", (doc_key, opData) ->
-			[project_id, doc_id] = Keys.splitProjectIdAndDocId(doc_key)
+			[project_id, doc_id, client_id] = Keys.splitProjectIdAndDocIdAndClientId(doc_key) #vfc
 			ShareJsUpdateManager._sendOp(project_id, doc_id, opData)
 	
 	_sendOp: (project_id, doc_id, op) ->
