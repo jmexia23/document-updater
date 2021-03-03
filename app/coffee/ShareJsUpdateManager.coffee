@@ -30,7 +30,7 @@ module.exports = ShareJsUpdateManager =
 		incomingUpdateVersion = update.v
 
 		#vfc temporary
-		client_id = update.meta.source (temporary)
+		client_id = update.meta.source #(temporary)
 
 
 		# We could use a global model for all docs, but we're hitting issues with the
