@@ -411,7 +411,7 @@ module.exports = RedisManager =
 	getObjectForOp: (project_id, doc_id, client_id, op, callback) ->  #op = update.op 
 		position = op.p
 	
-		rclient.zrangebyscore keys.userObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 0, position, (err, reply) ->
+		rclient.zrangebyscore keys.clientObjects(project_id: project_id, doc_id:doc_id, client_id: client_id), 0, position, (err, reply) ->
 			return callback(err) if err?
 			object_id = reply[0] 
 			callback null, object_id
