@@ -31,7 +31,7 @@ module.exports = class ShareJsDB
 		[project_id, doc_id, client_id, doc_id] = doc_key.split(":") #vfc probably temporary
 		project_doc = project_id + ":" + doc_id
 		if project_doc != Keys.combineProjectIdAndDocId(@project_id, @doc_id) #change to Keys.combineProjectIdAndDocIdAndClientId(project_id, doc_id, client_id)
-			return callback(new Errors.NotFoundError("unexpected doc_key #{doc_key}, expected #{Keys.combineProjectIdAndDocId(@project_id, @doc_id)}"))
+			return callback(new Errors.NotFoundError("unexpected doc_key #{project_doc}, expected #{Keys.combineProjectIdAndDocId(@project_id, @doc_id)}"))
 		else
 			return callback null, {
 				snapshot: @lines.join("\n")
