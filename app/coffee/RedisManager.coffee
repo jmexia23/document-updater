@@ -353,7 +353,8 @@ module.exports = RedisManager =
 				queueLength = reply[2]
 				callback(null, key, timestamp, queueLength)
 
-	#####################CHANGES########################			
+	#_______________________CHANGES_________________________
+
 	
 	loadConsistencyTables: (project_id, doc_id, client_id, symbols, callback) ->
 		
